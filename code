@@ -1,0 +1,109 @@
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+// Motor Pins
+#define IN1 18
+#define IN2 19
+#define IN3 25
+#define IN4 26 
+
+
+// Onboard LED (change if needed)
+#define LED 2
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("AI_Ambulance_");   // 🔹 Bluetooth Name
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(LED, OUTPUT);
+
+  digitalWrite(LED, LOW);
+
+  Serial.println("Bluetooth Started: AI_Ambulance");
+  Serial.println("Send 'E' for Emergency");
+}
+
+void loop() {
+
+  if (SerialBT.available()) {
+    char command = SerialBT.read();
+
+    if (command == 'E') {
+      Serial.println("Emergency Activated!");
+      digitalWrite(LED, HIGH);   // LED ON
+      emergencyPath();
+      digitalWrite(LED, LOW);    // LED OFF after parking
+    }
+  }
+}
+
+// ================= MOVEMENTS =================
+
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void right() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void left() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+// ================= EMERGENCY PATH =================
+
+void emergencyPath() {
+
+  // 🚑 Go to Patient
+  forward();
+  delay(3000);
+
+  right();
+  delay(1000);
+
+  left();
+  delay(1000);
+
+  stopMotors();
+  delay(2000);
+
+  // 🏥 Return to Hospital
+  left();
+  delay(1000);
+
+  right();
+  delay(1000);
+
+  forward();
+  delay(3000);
+
+  stopMotors();
+}
