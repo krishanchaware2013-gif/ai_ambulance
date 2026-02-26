@@ -1,0 +1,8 @@
+when Screen1.Initialize
+    set ListPicker1.Elements to BluetoothClient1.AddressesAndNames
+
+when ListPicker1.AfterPicking
+    call BluetoothClient1.Connect address ListPicker1.Selection
+
+when Button1.Click
+    call BluetoothClient1.SendText text "E"
